@@ -1,0 +1,49 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-brand-light: #F8F7F4;     /* Soft off-white/light neutral background */
+  --color-brand-dark: #1C1B19;      /* Rich dark text */
+  --color-brand-primary: #2D5A27;   /* Warm, earthy forest green */
+  --color-brand-primaryLight: #EAF2EA; /* Light green soft background */
+  --color-brand-secondary: #D4A373; /* Warm clay/beige secondary tone */
+  --color-brand-secondaryLight: #FAEDCD; /* Soft warm yellow/beige highlight */
+  --color-brand-neutralGray: #E9E7E2; /* Neutral gray borders/dividers */
+  
+  --font-sans: 'Outfit', 'Inter', sans-serif;
+}
+
+body {
+  background-color: var(--color-brand-light);
+  color: var(--color-brand-dark);
+  font-family: var(--font-sans);
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbars for a cleaner visual look */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-brand-light);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-brand-secondary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-brand-primary);
+}
+
+/* Assistive focus styling */
+input:focus, select:focus, textarea:focus {
+  outline: 2px solid var(--color-brand-primary);
+  outline-offset: 1px;
+}

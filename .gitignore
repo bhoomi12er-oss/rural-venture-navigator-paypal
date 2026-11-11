@@ -1,0 +1,12 @@
+
+/server/.env
+/server/.env.*
+
+**/node_modules/
+
+/server/data/
+**/.env
+**/.env.*
+**/node_modules/
+**/dist/
+*.log
