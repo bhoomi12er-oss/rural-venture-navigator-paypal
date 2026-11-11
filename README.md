@@ -1,127 +1,150 @@
 # Rural Venture Navigator — Dual Portal Marketplace & Entrepreneur Studio
 
-> **Empowering Rural Women Entrepreneurs with a Global PayPal Sandbox Payment Gateway & Specialized Business Studio**  
-> Rural Venture Navigator is a specialized platform designed for Self-Help Groups (SHGs) and rural millet entrepreneurs in Dhamtari district, Chhattisgarh.
+> Empowering rural millet entrepreneurs with a dedicated marketplace, business management tools, and PayPal Sandbox integration.
 
----
+Rural Venture Navigator is a role-based platform designed to connect customers with rural millet entrepreneurs. It provides two separate experiences: a customer marketplace for discovering and purchasing products, and an entrepreneur studio for managing products, orders, customer feedback, and business decisions.
 
 ## 🌟 Architecture & Two Distinct Portals
 
-The application is cleanly partitioned into two genuinely separate portals with strict role-based access control (RBAC):
+### 1. Customer Portal — `/customer/marketplace`
 
-### 1. 🛒 Customer Portal (`/customer/marketplace`)
-* **Dedicated E-Commerce Layout**: Clean, consumer-first marketplace with header, category filter pills, real-time keyword search, and customer profile pill.
-* **Rich Product Cards**: Displays image category badges, product titles, SHG producer details, prices in ₹ and PayPal USD, live inventory stock status, ingredients, and buyer repeat-purchase percentages.
-* **Cart & PayPal Checkout**:
-  * Slide-out cart drawer with itemized line totals and quantity adjustment (+ / -).
-  * Direct **"Buy Now"** button for immediate checkout.
-  * Official **PayPal JavaScript SDK buttons** powered by `@paypal/react-paypal-js`.
-  * Real-time server-side price validation (zero-trust client totals).
-* **Customer Orders & Receipts**:
-  * Confirmed order receipts with `✓ Paid via PayPal Sandbox` badges.
-  * PayPal Order ID (`5O19...`) and PayPal Capture ID (`CAP_...`).
-* **Post-Purchase Review Modal**:
-  * Direct feedback submission on flavor/quality (1-5 stars), price reasonability, and repeat purchase intent.
-* **No Business Tools**: No cost calculators, QR tests, or entrepreneur management tools are visible.
+A dedicated marketplace designed around the customer shopping experience.
 
-### 2. 💼 Shopkeeper / Entrepreneur Studio (`/entrepreneur/dashboard`)
-* **Dedicated SaaS Dashboard Layout**: Sidebar navigation customized specifically for rural millet business management.
-* **Product Catalog & Stock Management (`/entrepreneur/products`)**:
-  * Full CRUD inventory management: Add new product, edit existing product price/stock/ingredients, or delete a product.
-  * Real-time stock level monitoring (In Stock vs Low Stock alerts).
-* **Incoming Customer Orders (`/entrepreneur/orders`)**:
-  * Comprehensive fulfillment ledger displaying all incoming customer orders.
-  * Customer name, phone number, product name, quantity, total amount (₹), payment status, and verified PayPal Capture IDs.
-* **Customer Feedback & Sentiment Studio (`/entrepreneur/feedback`)**:
-  * Aggregated review ratings, repeat-buy percentages, price sentiment breakdown (Reasonable / Expensive / Cheap), and full buyer review logs.
-* **Business Analytics & Economics**:
-  * Unit Economics Calculator (`/entrepreneur/calculator`)
-  * Packaging QR Demand Testing (`/entrepreneur/demand-test`)
-  * Smart Decision Engine (`/entrepreneur/decision`)
-  * Business Profile (`/entrepreneur/profile`)
-* **No Customer Shopping Cart or Buy Buttons**: The shopkeeper portal strictly manages the business without buyer shopping cart widgets.
+- Browse millet products with category filters and keyword search.
+- View product details, prices, producer information, and stock availability.
+- Add products to a cart and adjust quantities.
+- Use Buy Now for direct checkout.
+- PayPal JavaScript SDK integration using `@paypal/react-paypal-js`.
+- View order history and available order details.
+- Submit product reviews covering quality, pricing, and repeat-purchase intent.
 
----
+The customer portal does not expose entrepreneur management tools.
+
+### 2. Entrepreneur Studio — `/entrepreneur/dashboard`
+
+A separate business-management interface for rural entrepreneurs.
+
+- **Product Management:** Add, edit, and delete products; manage prices, stock, and ingredients.
+- **Order Management:** View incoming customer orders and fulfillment details.
+- **Customer Feedback:** Review ratings, buyer feedback, and price sentiment.
+- **Unit Economics:** Estimate costs, pricing, and business profitability.
+- **Demand Testing:** Explore packaging QR-based demand testing.
+- **Smart Decision Engine:** Get AI-assisted business guidance.
+- **Business Profile:** Manage entrepreneur information.
+
+The entrepreneur portal does not expose customer shopping-cart or checkout functionality.
 
 ## 🔐 Role-Based Authentication & Route Protection
 
-* **Backend-Verified Roles**: Stored in MongoDB / local JSON database (`users.json`). The role is signed into the JWT payload (`id`, `role`, `name`) and checked on every protected API call via `protect` and `authorize('entrepreneur')` middleware.
-* **Frontend Route Guards (`RoleRoute.jsx`)**:
-  * `<CustomerRoute>`: Blocks non-customers and unauthenticated users. If a logged-in entrepreneur navigates to customer routes, they are redirected to `/entrepreneur/dashboard`.
-  * `<EntrepreneurRoute>`: Blocks non-entrepreneurs and unauthenticated users. If a customer attempts to access `/entrepreneur/*`, `/dashboard`, `/calculator`, etc., they are redirected to `/customer/marketplace`.
-  * `<PublicOnlyRoute>`: Automatically redirects already logged-in users away from `/login` and `/register` directly to their respective portals.
-* **Clean Session State**: Logging out clears `rvn_token`, `rvn_user`, and `rvn_cart`, preventing session bleeding when switching accounts.
+The application uses separate customer and entrepreneur access.
 
----
+- User roles are stored in the backend database.
+- JWT-based authentication carries user identity and role information.
+- Protected API routes use authentication and role-authorization middleware.
+- Customer and entrepreneur routes have separate frontend guards.
+- Authenticated users are redirected to their respective portals.
+- Logout clears the application's authentication and cart session data.
 
-## 🧪 Pre-Configured Test Accounts
+## 💳 PayPal Sandbox Integration
 
-| Role | Name | Phone Number | Password | Default Portal |
-|---|---|---|---|---|
-| **Customer / Buyer** | Anita Devi | `9876543210` | `password123` | `/customer/marketplace` |
-| **Entrepreneur / Seller** | Bhoomi Kumari | `9123456789` | `password123` | `/entrepreneur/dashboard` |
+The application includes a PayPal Sandbox checkout workflow.
 
-You can also register brand-new Customer or Entrepreneur accounts via the Registration screen (`/register`).
+- PayPal JavaScript SDK integration on the frontend.
+- Backend endpoints for creating and capturing PayPal orders.
+- Server-side product and price validation during order creation.
+- Sandbox credentials are configured through backend environment variables.
+- Order records are maintained by the backend.
 
----
+**Note:** PayPal Sandbox is intended for testing. Successful payment capture and receipt generation should be verified in the Sandbox environment before treating an order as paid.
 
 ## 🚀 Setup & Running Instructions
 
-### 1. Backend Setup
-```powershell
-cd "Rural venture PayPal/server"
-npm install
-npm start
-# Runs Express on port 5000
+### Prerequisites
+
+- Node.js and npm
+- PayPal Developer Sandbox account
+- MongoDB (optional if the local JSON fallback is supported by the configured application)
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/bhoomi12er-oss/rural-venture-navigator-paypal.git
+cd rural-venture-navigator-paypal
 ```
 
-### 2. Frontend Setup
-```powershell
-cd "Rural venture PayPal/client"
+### 2. Start the backend
+
+```bash
+cd server
 npm install
-npm run dev
-# Vite runs on http://localhost:5173
 ```
 
-### 3. PayPal Sandbox Configuration
-Edit `server/.env`:
+Create a `server/.env` file using your own local configuration:
+
 ```env
 PORT=5000
 NODE_ENV=development
-JWT_SECRET=your_jwt_secret_key_here
+JWT_SECRET=your_jwt_secret_here
 
 PAYPAL_MODE=sandbox
-PAYPAL_CLIENT_ID=your_paypal_sandbox_client_id_here
-PAYPAL_CLIENT_SECRET=your_paypal_sandbox_client_secret_here
+PAYPAL_CLIENT_ID=your_sandbox_client_id
+PAYPAL_CLIENT_SECRET=your_sandbox_client_secret
 PAYPAL_CURRENCY=USD
 EXCHANGE_RATE_INR_TO_USD=0.012
-PAYPAL_MOCK_FALLBACK=true
+PAYPAL_MOCK_FALLBACK=false
 ```
 
----
+Keep actual credentials private. Never commit `.env` files or expose the PayPal Client Secret in frontend code.
+
+Start the backend:
+
+```bash
+npm start
+```
+
+### 3. Start the frontend
+
+Open another terminal:
+
+```bash
+cd client
+npm install
+npm run dev
+```
+
+Open the local URL printed by Vite in your terminal. The default development port is usually `5173`, but Vite may select another available port.
 
 ## 📡 API Reference
 
-| Method | Endpoint | Protection | Description |
+| Method | Endpoint | Access | Description |
 |---|---|---|---|
-| `POST` | `/api/auth/register` | Public | Registers user with selected role (`customer` or `entrepreneur`). |
-| `POST` | `/api/auth/login` | Public | Authenticates user and returns JWT with verified role. |
-| `GET` | `/api/auth/me` | Authenticated | Returns current authenticated user and role. |
-| `GET` | `/api/orders/paypal-config` | Public | Returns public PayPal `clientId`, `currency`, and `exchangeRate`. |
-| `POST` | `/api/orders/create-paypal-order` | Authenticated | Server calculates trusted totals from DB and initiates PayPal order. |
-| `POST` | `/api/orders/capture-paypal-order` | Authenticated | Captures authorized order via PayPal API and records completed order. |
-| `GET` | `/api/orders` | Authenticated | Lists orders for authenticated user (customers see their purchases; entrepreneurs see incoming orders). |
-| `GET` | `/api/products` | Public | Lists active millet products for the customer marketplace. |
-| `GET` | `/api/products/my` | Entrepreneur Only | Lists products belonging to the logged-in entrepreneur. |
-| `POST` | `/api/products` | Entrepreneur Only | Adds a new product to the catalog. |
-| `PUT` | `/api/products/:id` | Entrepreneur Only | Updates price, stock, ingredients, or description of a product. |
-| `DELETE` | `/api/products/:id` | Entrepreneur Only | Deletes a product from the catalog. |
-| `POST` | `/api/feedback` | Authenticated | Submits customer review on product taste, price, and repeat buy intent. |
-| `GET` | `/api/feedback/my` | Entrepreneur Only | Retrieves customer reviews for the logged-in entrepreneur's products. |
+| POST | `/api/auth/register` | Public | Register a customer or entrepreneur |
+| POST | `/api/auth/login` | Public | Authenticate and receive a JWT |
+| GET | `/api/auth/me` | Authenticated | Retrieve the current user |
+| GET | `/api/orders/paypal-config` | Public | Retrieve public PayPal configuration |
+| POST | `/api/orders/create-paypal-order` | Authenticated | Create a PayPal order |
+| POST | `/api/orders/capture-paypal-order` | Authenticated | Request PayPal order capture |
+| GET | `/api/orders` | Authenticated | Retrieve role-specific orders |
+| GET | `/api/products` | Public | List marketplace products |
+| GET | `/api/products/my` | Entrepreneur | List the entrepreneur's products |
+| POST | `/api/products` | Entrepreneur | Add a product |
+| PUT | `/api/products/:id` | Entrepreneur | Update a product |
+| DELETE | `/api/products/:id` | Entrepreneur | Delete a product |
+| POST | `/api/feedback` | Authenticated | Submit product feedback |
+| GET | `/api/feedback/my` | Entrepreneur | Retrieve feedback for the entrepreneur's products |
 
----
+## 🛠️ Technology Stack
 
-## 🛡️ Security & Integrity Guarantee
-* **Original Folder Untouched**: The original `Rural venture` folder remains 100% clean and unmodified.
-* **Zero Client Price Trust**: All prices and conversions are calculated strictly on the backend.
-* **Secret Isolation**: `PAYPAL_CLIENT_SECRET` is kept strictly on the backend.
+- **Frontend:** React, Vite, JavaScript, CSS
+- **Backend:** Node.js, Express.js
+- **Database:** MongoDB with local JSON fallback where configured
+- **Authentication:** JWT
+- **Payments:** PayPal JavaScript SDK and PayPal Sandbox APIs
+- **AI:** AI-assisted business decision support
+
+## 🛡️ Security Considerations
+
+- PayPal Client Secret and other private credentials belong in backend environment variables.
+- The frontend should not be trusted to determine final order totals.
+- Protected backend routes should validate authentication and user roles.
+- Do not commit `.env` files, private credentials, or local
